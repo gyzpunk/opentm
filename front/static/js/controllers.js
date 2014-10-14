@@ -21,21 +21,21 @@ wkldApp.controller('wkldTable', function($scope) {
 
 	$scope.wkld = {
 		'Task 1': {
-			'2014-34': {
+			'2014-44': {
 				'planned': 4,
 				'current': 4
 			},
-			'2014-35': {
+			'2014-45': {
 				'planned': 4,
 				'current': 3
 			}
 		},
 		'Task 2': {
-			'2014-36': {
+			'2014-46': {
 				'planned': 5,
 				'current': 3
 			},
-			'2014-38': {
+			'2014-48': {
 				'planned': 5,
 				'current': 1
 			}
