@@ -7,6 +7,7 @@ from api.serializers import TaskSerializer, UserSerializer, AssignationSerialize
 class AssignationViewSet(viewsets.ModelViewSet):
     queryset = Assignation.objects.all()
     serializer_class = AssignationSerializer
+    filter_fields = ('user', 'task', )
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -1,119 +1,101 @@
-var wkldApp = angular.module('wkldApp', []);
+var wkldApp = new angular.module('wkldApp', ['ngResource']);
 
-wkldApp.controller('wkldTable', function($scope) {
-	$scope.sel_date = new Date();
-	
-	$scope.slot_type = 'month';
-	$scope.nb_slots = 6;
+wkldApp.config(function($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+});
 
-	$scope.task_rows = {};
+wkldApp.controller('wkldTable', function($scope, $resource) {
+    var User = $resource('/api/users/:userId/', {userId: '@id'});
+    var Task = $resource('/api/tasks/:taskId/', {taskId: '@id'}, {}, {stripTrailingSlashes: false});
+    var Assignation = $resource('/api/assignations/:assignationId/', {assignationId: '@id'});
 
-	$scope.new_task_name = '';
+    $scope.sel_date = new Date();
+    
+    $scope.slot_type = 'week';
+    $scope.nb_slots = 6;
 
-	$scope.resources = [
-		{
-			name: 'Florent'
-		},
-		{
-			name: 'Jeremy'
-		}
-	];
+    $scope.task_rows = {};
 
-	$scope.wkld = {
-		'Task 1': {
-			'2014-44': {
-				'planned': 4,
-				'current': 4
-			},
-			'2014-45': {
-				'planned': 4,
-				'current': 3
-			}
-		},
-		'Task 2': {
-			'2014-46': {
-				'planned': 5,
-				'current': 3
-			},
-			'2014-48': {
-				'planned': 5,
-				'current': 1
-			}
-		}
-	};
+    $scope.new_task_name = '';
 
-	$scope.prevSlot = function() {$scope.sel_date.setInterval($scope.slot_type, -1);}
-	$scope.nextSlot = function() {$scope.sel_date.setInterval($scope.slot_type, 1);}
+    $scope.users = User.query();
 
-	$scope.getSlots = function() {
-		var ret = [];
-		var cur_date = new Date(+$scope.sel_date);
-		cur_date.setInterval($scope.slot_type, -1);
-		for(var i=0; i<$scope.nb_slots; i++) {
-			cur_date.setInterval($scope.slot_type, 1);
-			if($scope.slot_type === 'year') {ret.push(cur_date.getFullYear());}
-			if($scope.slot_type === 'month') {ret.push(cur_date.getFullYear() + '-' + (cur_date.getMonth()+1));}
-			if($scope.slot_type === 'week') {ret.push(cur_date.getFullYear() + '-' + cur_date.getWeek());}
-		}
-		return ret;
-	};
+    $scope.prevSlot = function() {$scope.sel_date.setInterval($scope.slot_type, -1);}
+    $scope.nextSlot = function() {$scope.sel_date.setInterval($scope.slot_type, 1);}
 
-	function getTaskRows() {
-		var ret = {};
-		var slots = $scope.getSlots();
-		for(var i in $scope.wkld) {
-			ret[i] = initializeTaskRow();
-			for(var j in $scope.wkld[i]) {
-				var index = slots.indexOf(j);
-				if(index >= 0) {ret[i][index] = $scope.wkld[i][j];}
-			}
-		}
-		return ret;
-	}
+    $scope.getSlots = function() {
+        var ret = [];
+        var cur_date = new Date(+$scope.sel_date);
+        cur_date.setInterval($scope.slot_type, -1);
+        for(var i=0; i<$scope.nb_slots; i++) {
+            cur_date.setInterval($scope.slot_type, 1);
+            if($scope.slot_type === 'year') {ret.push(cur_date.getFullYear());}
+            if($scope.slot_type === 'month') {ret.push(cur_date.getFullYear() + '-' + (cur_date.getMonth()+1));}
+            if($scope.slot_type === 'week') {ret.push(cur_date.getFullYear() + '-' + cur_date.getWeek());}
+        }
+        return ret;
+    };
 
-	function initializeTaskRow() {
-		var ret = [];
-		for(var i=0; i<$scope.nb_slots; i++) {
-			ret.push(
-				{'planned':0, 'current':0}
-			);
-		}
-		return ret;
-	}
+    function getTaskRows() {
+        var ret = {};
+        var slots = $scope.getSlots();
+        var assignations = Assignation.query({user:$scope.current_userId}, function() {
+            for(var i in assignations) {
+                if(!(assignations[i] instanceof Assignation)) {continue;}
+                if(ret[assignations[i]['task_name']] == undefined) {ret[assignations[i]['task_name']] = initializeTaskRow();}
+                var index = slots.indexOf(assignations[i]['year']+'-'+assignations[i][$scope.slot_type]);
+                if(index >= 0) {ret[assignations[i]['task_name']][index] = assignations[i];}
+            }
+        });
+        return ret;
+    }
 
-	$scope.refresh = function() {
-		$scope.task_rows = getTaskRows();
-	}
+    function initializeTaskRow() {
+        var ret = [];
+        for(var i=0; i<$scope.nb_slots; i++) {
+            ret.push(
+                {'wkld_planned':0, 'wkld_current':0}
+            );
+        }
+        return ret;
+    }
 
-	$scope.getPercentage = function(current, total) {
-		if(total == 0) {
-			if(current > 0) {return 101;}
-			return -1;
-		}
-		return current*100/total
-	};
+    $scope.refresh = function() {
+        $scope.task_rows = getTaskRows();
+    }
 
-	$scope.getAchClass = function(current, planned) {
-		if(planned < current) {return 'progress-bar-danger';}
-		if(planned == current) {return 'progress-bar-success';}
-		return 'progress-bar-info';
-	};
+    $scope.getPercentage = function(current, total) {
+        if(total == 0) {
+            if(current > 0) {return 101;}
+            return -1;
+        }
+        return Math.floor(current*100/total)
+    };
 
-	$scope.getInputMax = function() {
-		switch($scope.slot_type) {
-			case 'year':
-				return 250;
-			case 'month':
-				return 30;
-			case 'week':
-				return 5;
-		}
-	}
+    $scope.getAchClass = function(current, planned) {
+        if(planned < current) {return 'progress-bar-danger';}
+        if(planned == current) {return 'progress-bar-success';}
+        return 'progress-bar-info';
+    };
 
-	$scope.addNewTask = function() {
-		$scope.wkld[$scope.new_task_name] = {};
-		$scope.new_task_name = '';
-	}
+    $scope.getInputMax = function() {
+        switch($scope.slot_type) {
+            case 'year':
+                return 250;
+            case 'month':
+                return 30;
+            case 'week':
+                return 5;
+        }
+    }
 
-	$scope.task_rows = getTaskRows();
+    $scope.addNewTask = function() {
+        Task.save({name:$scope.new_task_name}, function() {
+            $scope.task_rows[$scope.new_task_name] = initializeTaskRow();
+		    $scope.new_task_name = '';
+        });
+    }
+
+    $scope.task_rows = getTaskRows();
 });

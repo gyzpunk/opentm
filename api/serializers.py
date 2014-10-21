@@ -9,26 +9,29 @@ from core.models import Task, Assignation
 
 
 class AssignationSerializer(serializers.ModelSerializer):
-    user_url = serializers.HyperlinkedRelatedField(view_name='user-detail', source='user', read_only=True)
-    task_url = serializers.HyperlinkedRelatedField(view_name='task-detail', source='task', read_only=True)
+    task_id = serializers.RelatedField(source='task_id')
+    task_name = serializers.RelatedField(source='task')
+    user_id = serializers.RelatedField(source='user_id')
+    #user_url = serializers.HyperlinkedRelatedField(view_name='user-detail', source='user', read_only=True)
+    #task_url = serializers.HyperlinkedRelatedField(view_name='task-detail', source='task', read_only=True)
     month = serializers.Field(source='month')
 
     class Meta:
         model = Assignation
-        fields = ['id', 'task', 'task_url', 'user', 'user_url', 'week', 'month', 'year', 'wkld_planned', 'wkld_current']
+        fields = ['id', 'task_id', 'task_name', 'user_id', 'week', 'month', 'year', 'wkld_planned', 'wkld_current']
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     tasks = serializers.RelatedField(many=True)
     assignations = AssignationSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ['url', 'username', 'first_name', 'last_name']
+        fields = ['id', 'username', 'first_name', 'last_name']
 
 
-class TaskSerializer(serializers.HyperlinkedModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
     users = UserSerializer(many=True)
 
     class Meta:
         model = Task
-        fields = ['url', 'name']
+        fields = ['id', 'name']
