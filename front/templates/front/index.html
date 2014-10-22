@@ -9,6 +9,8 @@
         <script src="{% static 'js/angular.min.js' %}"></script>
         <script src="{% static 'js/angular-resource.min.js' %}"></script>
         <script src="{% static 'js/Date.js' %}"></script>
+        <script src="{% static 'js/applications.js' %}"></script>
+        <script src="{% static 'js/factories.js' %}"></script>
         <script src="{% static 'js/controllers.js' %}"></script>
     </head>
     {% verbatim %}
@@ -27,13 +29,6 @@
             <div ng-controller="wkldTable">
                 <ul class="pager">
                     <li class="previous"><a ng-click="prevSlot();refresh()" href="#">&larr; Older</a></li>
-                    <!-- <li>
-                        <div class="btn-group">
-                            <button class="btn btn-primary" ng-class="{active:(slot_type=='year')}" ng-click="slot_type='year';refresh()">Year</button>
-                            <button class="btn btn-primary" ng-class="{active:(slot_type=='month')}" ng-click="slot_type='month';refresh()">Month</button>
-                            <button class="btn btn-primary" ng-class="{active:(slot_type=='week')}" ng-click="slot_type='week';refresh()">Week</button>
-                        </div>
-                    </li> -->
                     <li class="next"><a ng-click="nextSlot();refresh()" href="#">Newer &rarr;</a></li>
                 </ul>
                 <!-- WORKLOAD TABLE BEGIN -->
@@ -41,7 +36,7 @@
                     <thead>
                         <tr>
                             <td colspan="{{ nb_slots + 1 }}" class="text-right">
-                                <label>Nb {{slot_type}}s:</label>
+                                <label>Nb weeks:</label>
                                 <input type="number" class="form-control" style="width:4em;" ng-change="refresh()" ng-model="nb_slots">
                                 <label>Ressource:</label>
                                 <select class="form-control" ng-change="refresh()" ng-model="current_userId">
@@ -57,14 +52,18 @@
                     <tbody>
                         <tr ng-repeat="(name,slots) in task_rows">
                             <th>{{ name }}</th>
-                            <td ng-repeat="slot_charges in slots" class="text-right">
-                                <label>Plan.</label>
-                                <input style="width:4em" class="form-control input-sm" ng-model="slot_charges.wkld_planned" type="number" min="0" max="{{getInputMax()}}"></input><br>
-                                <label>Cur.</label>
-                                <input style="width:4em" class="form-control input-sm" ng-model="slot_charges.wkld_current" type="number" min="0" max="{{getInputMax()}}"></input><br><br>
+                            <td ng-repeat="slot in slots" class="text-right">
+                                <!-- <form ng-submit="setAssignation(slot.id, slot.task_id, slot.week, slot.year, slot.wkld_planned, slot.wkld_current);"> -->
+                                <form ng-submit="slot.$update();">
+                                    <label>Plan.</label>
+                                    <input style="width:4em" class="form-control input-sm" ng-model="slot.wkld_planned" type="number" min="0" max="{{getInputMax()}}"></input><br>
+                                    <label>Cur.</label>
+                                    <input style="width:4em" class="form-control input-sm" ng-model="slot.wkld_current" type="number" min="0" max="{{getInputMax()}}"></input>
+                                    <button type="submit" class="hidden"></button>
+                                </form><br>
                                 <div class="progress">
-                                    <div class="progress-bar" ng-class="getAchClass(slot_charges.wkld_current, slot_charges.wkld_planned)" role="progressbar" aria-valuenow="{{ getPercentage(slot_charges.wkld_current, slot_charges.wkld_planned) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ getPercentage(slot_charges.wkld_current, slot_charges.wkld_planned) }}%;">
-                                        {{ getPercentage(slot_charges.wkld_current, slot_charges.wkld_planned) }}%
+                                    <div class="progress-bar" ng-class="getAchClass(slot.wkld_current, slot.wkld_planned)" role="progressbar" aria-valuenow="{{ getPercentage(slot.wkld_current, slot.wkld_planned) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ getPercentage(slot.wkld_current, slot.wkld_planned) }}%;">
+                                        {{ getPercentage(slot.wkld_current, slot.wkld_planned) }}%
                                     </div>
                                 </div>
                             </td>
