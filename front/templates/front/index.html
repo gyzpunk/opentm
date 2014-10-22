@@ -39,7 +39,7 @@
                                 <label>Nb weeks:</label>
                                 <input type="number" class="form-control" style="width:4em;" ng-change="refresh()" ng-model="nb_slots">
                                 <label>Ressource:</label>
-                                <select class="form-control" ng-change="refresh()" ng-model="current_userId">
+                                <select class="form-control" ng-change="refresh()" ng-model="currentUserId">
                                     <option ng-repeat="user in users" value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
                                 </select>
                             </td>
