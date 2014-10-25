@@ -25,6 +25,14 @@ wkldApp.factory('Assignation', ['$resource', function($resource) {
                     data.task_id = data.task.id;
                     return angular.toJson(data);
                 }
+            },
+            save: {
+                method:'POST',
+                transformRequest: function(data, headersGetter) {
+                    data.user_id = data.user.id;
+                    data.task_id = data.task.id;
+                    return angular.toJson(data);
+                }
             }
         }
     );

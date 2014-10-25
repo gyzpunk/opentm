@@ -46,15 +46,14 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <th ng-repeat="slot in getSlots()">{{ slot }}</th>
+                            <th ng-repeat="slot in hSlots">{{ slot[0] }}-{{ slot[1] }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="(name,slots) in task_rows">
-                            <th>{{ name }}</th>
+                        <tr ng-repeat="(taskName,slots) in task_rows">
+                            <th>{{ taskName }}</th>
                             <td ng-repeat="slot in slots" class="text-right">
-                                <!-- <form ng-submit="setAssignation(slot.id, slot.task_id, slot.week, slot.year, slot.wkld_planned, slot.wkld_current);"> -->
-                                <form ng-submit="slot.$update();">
+                                <form ng-submit="saveAssignation(slot)">
                                     <label>Plan.</label>
                                     <input style="width:4em" class="form-control input-sm" ng-model="slot.wkld_planned" type="number" min="0" max="{{getInputMax()}}"></input><br>
                                     <label>Cur.</label>
@@ -70,7 +69,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <form ng-submit="addNewTask();refresh();">
+                                <form ng-submit="addNewTask()">
                                     <input type="text" placeholder="Add new..." class="form-control" ng-model="new_task_name">
                                 </form>
                                 </td>
