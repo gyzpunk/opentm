@@ -1,0 +1,7 @@
+table.table th {
+	background-color: rgb(240,240,240);
+}
+
+table.table thead td {
+	border-width: 0;
+}

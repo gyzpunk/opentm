@@ -5,47 +5,54 @@
         <title>My workload</title>
         <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap-sg.css' %}">
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
         <script src="{% static 'js/angular.min.js' %}"></script>
         <script src="{% static 'js/angular-resource.min.js' %}"></script>
+        <script src="{% static 'js/ui-bootstrap-tpls-0.11.2.js' %}"></script>
         <script src="{% static 'js/Date.js' %}"></script>
-        <script src="{% static 'js/applications.js' %}"></script>
-        <script src="{% static 'js/factories.js' %}"></script>
-        <script src="{% static 'js/controllers.js' %}"></script>
     </head>
     {% verbatim %}
     <body class="container">
         <div class="row">
-            <h1>Open Team Manager</h1>
-        </div>
-        <div class="row">
-            <nav>
-                <ul>
+            <h1 class="page-header">Open Team Manager</h1>
+            <nav class="navbar navbar-default" role="navigation">
+                <ul class="nav navbar-nav">
                     <li><a href="#">Planning</a></li>
+                    <li><a href="#">Wishlist</a></li>
+                    <li><a href="#">White-board</a></li>
                 </ul>
             </nav>
         </div>
         <div class="row">
             <div ng-controller="wkldTable">
-                <ul class="pager">
+                <!-- BEGIN : Resource selection form -->
+                <form class="form-inline">
+                    <label>Resource:</label>
+                    <select class="form-control" ng-change="refresh()" ng-model="currentUserId">
+                        <option ng-repeat="user in users" value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                    </select>
+                </form>
+                <!-- END : Resource selection form -->
+
+                <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+
+                <ul class="pager" ng-if="currentUserId">
                     <li class="previous"><a ng-click="prevSlot();refresh()" href="#">&larr; Older</a></li>
                     <li class="next"><a ng-click="nextSlot();refresh()" href="#">Newer &rarr;</a></li>
                 </ul>
-                <!-- WORKLOAD TABLE BEGIN -->
-                <table class="table table-bordered form-inline">
+
+                <!-- BEGIN : WORKLOAD TABLE -->
+                <table class="table table-bordered form-inline" ng-if="currentUserId">
                     <thead>
                         <tr>
                             <td colspan="{{ nb_slots + 1 }}" class="text-right">
                                 <label>Nb weeks:</label>
                                 <input type="number" class="form-control" style="width:4em;" ng-change="refresh()" ng-model="nb_slots">
-                                <label>Ressource:</label>
-                                <select class="form-control" ng-change="refresh()" ng-model="currentUserId">
-                                    <option ng-repeat="user in users" value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
-                                </select>
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
+                            <th>Tasks</th>
                             <th ng-repeat="slot in hSlots">{{ slot[0] }}-{{ slot[1] }}</th>
                         </tr>
                     </thead>
@@ -67,19 +74,24 @@
                                 </div>
                             </td>
                         </tr>
+                    </tbody>
+                    <tfoot>
                         <tr>
                             <td>
                                 <form ng-submit="addNewTask()">
-                                    <input type="text" placeholder="Add new..." class="form-control" ng-model="new_task_name">
+                                    <input type="text" placeholder="Add new..." class="form-control" ng-model="newTaskName" typeahead="task.name for task in tasks | filter:$viewValue | limitTo:8">
                                 </form>
                                 </td>
                             <td colspan="{{ nb_slots }}"></td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
-                <!-- WORKLOAD TABLE END -->
+                <!-- END : WORKLOAD TABLE -->
             </div>
         </div>
     </body>
     {% endverbatim %}
+    <script src="{% static 'js/applications.js' %}"></script>
+    <script src="{% static 'js/factories.js' %}"></script>
+    <script src="{% static 'js/controllers.js' %}"></script>
 </html>
