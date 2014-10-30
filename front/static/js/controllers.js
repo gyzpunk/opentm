@@ -7,7 +7,6 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
     $scope.hSlots = [];
     $scope.newTaskName = '';
     $scope.alerts = [];
-
     $scope.users = User.query();
     $scope.tasks = Task.query();
 
@@ -35,7 +34,7 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
             ret.push([cur_date.getFullYear(), cur_date.getWeek()]);
         }
         return ret;
-    };
+    }
 
     function getTaskRows() {
         var ret = {};
@@ -84,17 +83,17 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
             return -1;
         }
         return Math.floor(current*100/total)
-    };
+    }
 
     $scope.getAchClass = function(current, planned) {
         if(planned < current) {return 'progress-bar-danger';}
         if(planned == current) {return 'progress-bar-success';}
         return 'progress-bar-info';
-    };
+    }
 
     $scope.getInputMax = function() {
         return 5;
-    };
+    }
 
     function fillEmptyTaskRow(task) {
         $scope.task_rows[task.name] = [];
@@ -119,19 +118,20 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
         if(!task) {
             task = new Task();
             task.name = $scope.newTaskName;
-            var tt = task.$save(function() {
-                    console.debug(task);
+            var tt = task.$save(
+                function() {
                     fillEmptyTaskRow(task);
-                    addAlert('success', 'The task '+task.name+' was properly created.')
-                },function() {
-                    addAlert('error', 'The task '+task.name+' failed to be created.')
-                });
+                    addAlert('success', 'The task '+task.name+' was properly created.');
+                }, function() {
+                    addAlert('danger', 'The task '+task.name+' failed to be created.');
+                }
+            );
         } else {
             fillEmptyTaskRow(task);
         }
 
         $scope.newTaskName = '';
-    };
+    }
 
     $scope.saveAssignation = function(assignation) {
         if(assignation.id) {
@@ -145,7 +145,5 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
                 function() {addAlert('danger', 'Assignation #'+assignation.id+' failed to be created.')}
             );
         }
-    };
-
-    $scope.refresh();
+    }
 }]);
