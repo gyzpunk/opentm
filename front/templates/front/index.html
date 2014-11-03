@@ -40,13 +40,13 @@
 
                 <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
 
-                <ul class="pager" ng-if="currentUserId">
+                <ul class="pager" ng-show="currentUserId">
                     <li class="previous"><a ng-click="prevSlot();refresh()" href="#">&larr; Older</a></li>
                     <li class="next"><a ng-click="nextSlot();refresh()" href="#">Newer &rarr;</a></li>
                 </ul>
 
                 <!-- BEGIN : WORKLOAD TABLE -->
-                <table class="table table-bordered form-inline" ng-if="currentUserId">
+                <table class="table table-bordered form-inline" ng-show="currentUserId">
                     <thead>
                         <tr>
                             <td colspan="{{ nb_slots + 1 }}" class="text-right">
