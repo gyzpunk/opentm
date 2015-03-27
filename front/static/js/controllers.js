@@ -53,10 +53,10 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
                 Task.get({id:t_id}, function(task) {
                     ret[task.name] = [];
                     angular.forEach($scope.hSlots, function(d) {
-                        y = d[0];
-                        w = d[1];
+                        var y = d[0];
+                        var w = d[1];
                         var t_as;
-                        if(as[y][w]) {
+                        if(as[y] && as[y][w]) {
                             t_as = as[y][w];
                         } else {
                             t_as = new Assignation({year:y, week:w, wkld_planned:0, wkld_current:0});
@@ -75,24 +75,6 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
     $scope.refresh = function() {
         $scope.hSlots = getSlots();
         $scope.task_rows = getTaskRows();
-    }
-
-    $scope.getPercentage = function(current, total) {
-        if(total == 0) {
-            if(current > 0) {return 101;}
-            return -1;
-        }
-        return Math.floor(current*100/total)
-    }
-
-    $scope.getAchClass = function(current, planned) {
-        if(planned < current) {return 'progress-bar-danger';}
-        if(planned == current) {return 'progress-bar-success';}
-        return 'progress-bar-info';
-    }
-
-    $scope.getInputMax = function() {
-        return 5;
     }
 
     function fillEmptyTaskRow(task) {
@@ -133,7 +115,14 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
         $scope.newTaskName = '';
     }
 
-    $scope.saveAssignation = function(assignation) {
+
+}])
+
+.controller('assignationCellController', ['$scope', '$log', function($scope, $log) {
+    $scope.assignation = $scope.slot;
+    $scope.consumption = 0;
+
+    $scope.save = function() {
         if(assignation.id) {
             assignation.$update(
                 function() {addAlert('success', 'Assignation #'+assignation.id+' was properly updated.')},
@@ -145,5 +134,28 @@ wkldApp.controller('wkldTable', ['$scope', '$resource', 'User', 'Task', 'Assigna
                 function() {addAlert('danger', 'Assignation #'+assignation.id+' failed to be created.')}
             );
         }
+    };
+
+    $scope.getInputMax = function() {
+        return 5;
     }
+
+    var getPercentage = function() {
+        if($scope.assignation.wkld_planned == 0) {
+            if($scope.assignation.wkld_current > 0) {return 101;}
+            return -1;
+        }
+        return Math.floor($scope.assignation.wkld_current*100/$scope.assignation.wkld_planned)
+    }
+
+    $scope.getAchClass = function() {
+        if($scope.assignation.wkld_planned < $scope.assignation.wkld_current) {return 'progress-bar-danger';}
+        if($scope.assignation.wkld_planned == $scope.assignation.wkld_current) {return 'progress-bar-success';}
+        return 'progress-bar-info';
+    }
+
+    $scope.$watchCollection('assignation', function(newAssignation, oldAssignation) {
+        $log.info('Assignation changed');
+        $scope.consumption = ($scope.slot.wkld_planned == 0) ? $scope.slot.wkld_current*100 : Math.floor($scope.slot.wkld_current*100/$scope.slot.wkld_planned);
+    });
 }]);

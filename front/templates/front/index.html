@@ -3,13 +3,13 @@
 <html lang="en" ng-app="wkldApp">
     <head>
         <title>Open Team Manager</title>
-        <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+        <script src="{% static 'js/jquery.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/bootstrap-sg.css' %}">
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'js/angular.min.js' %}"></script>
-        <script src="{% static 'js/angular-resource.min.js' %}"></script>
-        <script src="{% static 'js/ui-bootstrap-tpls-0.11.2.js' %}"></script>
+        <script src="{% static 'js/angular.js' %}"></script>
+        <script src="{% static 'js/angular-resource.js' %}"></script>
+        <script src="{% static 'js/ui-bootstrap-tpls.js' %}"></script>
         <script src="{% static 'js/Date.js' %}"></script>
         <script src="{% static 'js/applications.js' %}"></script>
         <script src="{% static 'js/factories.js' %}"></script>
@@ -62,8 +62,8 @@
                     <tbody>
                         <tr ng-repeat="(taskName,slots) in task_rows">
                             <th>{{ taskName }}</th>
-                            <td ng-repeat="slot in slots" class="text-right">
-                                <form ng-submit="saveAssignation(slot)">
+                            <td ng-repeat="slot in slots" ng-controller="assignationCellController" class="text-right">
+                                <form ng-submit="save()">
                                     <label>Plan.</label>
                                     <input style="width:4em" class="form-control input-sm" ng-model="slot.wkld_planned" type="number" min="0" max="{{getInputMax()}}"><br>
                                     <label>Cur.</label>
@@ -71,8 +71,8 @@
                                     <button type="submit" class="hidden"></button>
                                 </form><br>
                                 <div class="progress">
-                                    <div class="progress-bar" ng-class="getAchClass(slot.wkld_current, slot.wkld_planned)" role="progressbar" aria-valuenow="{{ getPercentage(slot.wkld_current, slot.wkld_planned) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ getPercentage(slot.wkld_current, slot.wkld_planned) }}%;">
-                                        {{ getPercentage(slot.wkld_current, slot.wkld_planned) }}%
+                                    <div class="progress-bar" ng-class="getAchClass()" role="progressbar" aria-valuenow="{{ consumption }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (consumption < 100) ? consumption : 100 }}%;">
+                                        {{ consumption }}%
                                     </div>
                                 </div>
                             </td>
