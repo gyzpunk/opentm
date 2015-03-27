@@ -5,4 +5,6 @@ wkldApp.config(['$httpProvider', '$resourceProvider', function($httpProvider, $r
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     $httpProvider.defaults.cache = false;
     $resourceProvider.defaults.stripTrailingSlashes = false;
-}]);
+}])
+
+.value('currentUser', {id: 0});

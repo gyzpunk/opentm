@@ -1,22 +1,14 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en" ng-app="wkldApp">
+<html lang="en" data-ng-app="wkldApp">
     <head>
         <title>Open Team Manager</title>
-        <script src="{% static 'js/jquery.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/bootstrap-sg.css' %}">
-        <script src="{% static 'js/bootstrap.min.js' %}"></script>
-        <script src="{% static 'js/angular.js' %}"></script>
-        <script src="{% static 'js/angular-resource.js' %}"></script>
-        <script src="{% static 'js/ui-bootstrap-tpls.js' %}"></script>
-        <script src="{% static 'js/Date.js' %}"></script>
-        <script src="{% static 'js/applications.js' %}"></script>
-        <script src="{% static 'js/factories.js' %}"></script>
-        <script src="{% static 'js/controllers.js' %}"></script>
     </head>
-    {% verbatim %}
+
     <body class="container">
+        {% verbatim %}
         <div class="row">
             <h1 class="page-header">Open Team Manager</h1>
             <nav class="navbar navbar-default" role="navigation">
@@ -28,50 +20,50 @@
             </nav>
         </div>
         <div class="row">
-            <div ng-controller="wkldTable">
+            <div data-ng-controller="wkldTable">
                 <!-- BEGIN : Resource selection form -->
                 <form class="form-inline">
                     <label>Resource:</label>
-                    <select class="form-control" ng-change="refresh()" ng-model="currentUserId">
-                        <option ng-repeat="user in users" value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                    <select class="form-control" data-ng-model="currentUserId">
+                        <option data-ng-repeat="user in users" value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
                     </select>
                 </form>
                 <!-- END : Resource selection form -->
 
-                <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+                <alert data-ng-repeat="alert in alert.list" type="{{alert.type}}" close="alert.close($index)">{{alert.msg}}</alert>
 
-                <ul class="pager" ng-show="currentUserId">
-                    <li class="previous"><a ng-click="prevSlot();refresh()" href="#">&larr; Older</a></li>
-                    <li class="next"><a ng-click="nextSlot();refresh()" href="#">Newer &rarr;</a></li>
+                <ul class="pager" data-ng-if="currentUserId">
+                    <li class="previous"><a data-ng-click="prevSlot()" href="#">&larr; Older</a></li>
+                    <li class="next"><a data-ng-click="nextSlot()" href="#">Newer &rarr;</a></li>
                 </ul>
 
                 <!-- BEGIN : WORKLOAD TABLE -->
-                <table class="table table-bordered form-inline" ng-show="currentUserId">
+                <table class="table table-bordered form-inline" data-ng-if="currentUserId" data-ng-controller="wkldTableController">
                     <thead>
                         <tr>
-                            <td colspan="{{ nb_slots + 1 }}" class="text-right">
+                            <td colspan="{{ nbSlots + 1 }}" class="text-right">
                                 <label>Nb weeks:</label>
-                                <input type="number" class="form-control" style="width:4em;" ng-change="refresh()" ng-model="nb_slots">
+                                <input type="number" class="form-control" style="width:4em;" data-ng-model="nbSlots">
                             </td>
                         </tr>
                         <tr>
                             <th>Tasks</th>
-                            <th ng-repeat="slot in hSlots">{{ slot[0] }}-{{ slot[1] }}</th>
+                            <th data-ng-repeat="slot in slots.slots">{{ slot[0] }}-{{ slot[1] }}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="(taskName,slots) in task_rows">
+                        <tr data-ng-repeat="(taskName,slots) in task_rows">
                             <th>{{ taskName }}</th>
-                            <td ng-repeat="slot in slots" ng-controller="assignationCellController" class="text-right">
-                                <form ng-submit="save()">
+                            <td data-ng-repeat="assignation in slots" data-ng-controller="assignationCellController" class="text-right">
+                                <form data-ng-submit="save()">
                                     <label>Plan.</label>
-                                    <input style="width:4em" class="form-control input-sm" ng-model="slot.wkld_planned" type="number" min="0" max="{{getInputMax()}}"><br>
+                                    <input style="width:4em" class="form-control input-sm" data-ng-model="assignation.wkld_planned" type="number" min="0" max="{{getInputMax()}}"><br>
                                     <label>Cur.</label>
-                                    <input style="width:4em" class="form-control input-sm" ng-model="slot.wkld_current" type="number" min="0" max="{{getInputMax()}}">
+                                    <input style="width:4em" class="form-control input-sm" data-ng-model="assignation.wkld_current" type="number" min="0" max="{{getInputMax()}}">
                                     <button type="submit" class="hidden"></button>
                                 </form><br>
                                 <div class="progress">
-                                    <div class="progress-bar" ng-class="getAchClass()" role="progressbar" aria-valuenow="{{ consumption }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (consumption < 100) ? consumption : 100 }}%;">
+                                    <div class="progress-bar" data-ng-class="getAchClass()" role="progressbar" aria-valuenow="{{ consumption }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (consumption < 100) ? consumption : 100 }}%;">
                                         {{ consumption }}%
                                     </div>
                                 </div>
@@ -81,17 +73,26 @@
                     <tfoot>
                         <tr>
                             <td>
-                                <form ng-submit="addNewTask()">
-                                    <input type="text" placeholder="Add new..." class="form-control" ng-model="newTaskName" typeahead="task.name for task in tasks | filter:$viewValue | limitTo:8">
+                                <form data-ng-submit="addNewTask()">
+                                    <input type="text" placeholder="Add new..." class="form-control" data-ng-model="newTaskName" typeahead="task.name for task in tasks | filter:$viewValue | limitTo:8">
                                 </form>
                                 </td>
-                            <td colspan="{{ nb_slots }}"></td>
+                            <td colspan="{{ nbSlots }}"></td>
                         </tr>
                     </tfoot>
                 </table>
                 <!-- END : WORKLOAD TABLE -->
             </div>
         </div>
+        {% endverbatim %}
+        <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/angular.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/angular-resource.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/ui-bootstrap-tpls.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/Date.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/applications.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/factories.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/controllers.js' %}"></script>
     </body>
-    {% endverbatim %}
 </html>
