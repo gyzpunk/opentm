@@ -130,14 +130,6 @@ wkldApp.controller('wkldTable', ['$scope', 'User', 'Task', 'slots', 'currentUser
         return 5;
     }
 
-    var getPercentage = function() {
-        if($scope.assignation.wkld_planned == 0) {
-            if($scope.assignation.wkld_current > 0) {return 101;}
-            return -1;
-        }
-        return Math.floor($scope.assignation.wkld_current*100/$scope.assignation.wkld_planned)
-    }
-
     $scope.getAchClass = function() {
         if($scope.assignation.wkld_planned < $scope.assignation.wkld_current) {return 'progress-bar-danger';}
         if($scope.assignation.wkld_planned == $scope.assignation.wkld_current) {return 'progress-bar-success';}
