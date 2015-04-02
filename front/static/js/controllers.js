@@ -110,17 +110,17 @@ wkldApp.controller('wkldTable', ['$scope', 'User', 'Task', 'slots', 'currentUser
 }])
 
 .controller('assignationCellController', ['$scope', '$log', 'alert', function($scope, $log, alert) {
-    $scope.consumption = 0;
+    $scope.unsaved = false;
 
     $scope.save = function() {
         if($scope.assignation.id) {
             $scope.assignation.$update(
-                function() {alert.add('success', 'Assignation #'+$scope.assignation.id+' was properly updated.')},
+                function() {alert.add('success', 'Assignation #'+$scope.assignation.id+' was properly updated.'); $scope.unsaved = false;},
                 function() {alert.add('danger', 'Assignation #'+$scope.assignation.id+' failed to be updated.')}
             );
         } else {
             $scope.assignation.$save(
-                function() {alert.add('success', 'Assignation #'+$scope.assignation.id+' was properly created.')},
+                function() {alert.add('success', 'Assignation #'+$scope.assignation.id+' was properly created.'); $scope.unsaved = false;},
                 function() {alert.add('danger', 'Assignation #'+$scope.assignation.id+' failed to be created.')}
             );
         }
@@ -128,16 +128,9 @@ wkldApp.controller('wkldTable', ['$scope', 'User', 'Task', 'slots', 'currentUser
 
     $scope.getInputMax = function() {
         return 5;
-    }
+    };
 
-    $scope.getAchClass = function() {
-        if($scope.assignation.wkld_planned < $scope.assignation.wkld_current) {return 'progress-bar-danger';}
-        if($scope.assignation.wkld_planned == $scope.assignation.wkld_current) {return 'progress-bar-success';}
-        return 'progress-bar-info';
-    }
-
-    $scope.$watchCollection('assignation', function(newAssignation, oldAssignation) {
-        $log.info('Assignation changed');
-        $scope.consumption = (newAssignation.wkld_planned == 0) ? newAssignation.wkld_current*100 : Math.floor(newAssignation.wkld_current*100/newAssignation.wkld_planned);
+    $scope.$watchGroup(['assignation.wkld_current', 'assignation.wkld_planned'], function(newGrp, oldGrp) {
+        if(newGrp != oldGrp) {$scope.unsaved = true;}
     });
 }]);

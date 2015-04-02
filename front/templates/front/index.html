@@ -53,7 +53,7 @@
                     <tbody>
                         <tr data-ng-repeat="(taskName,slots) in task_rows">
                             <th>{{ taskName }}</th>
-                            <td data-ng-repeat="assignation in slots" data-ng-controller="assignationCellController" class="text-right">
+                            <td data-ng-repeat="assignation in slots" data-ng-controller="assignationCellController" class="text-right" data-ng-class="{'bg-warning':unsaved}">
                                 <form data-ng-submit="save()">
                                     <label>Plan.</label>
                                     <input style="width:4em" class="form-control input-sm" data-ng-model="assignation.wkld_planned" type="number" min="0" max="{{getInputMax()}}"><br>
@@ -61,11 +61,7 @@
                                     <input style="width:4em" class="form-control input-sm" data-ng-model="assignation.wkld_current" type="number" min="0" max="{{getInputMax()}}">
                                     <button type="submit" class="hidden"></button>
                                 </form><br>
-                                <div class="progress">
-                                    <div class="progress-bar" data-ng-class="getAchClass()" role="progressbar" aria-valuenow="{{ consumption }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ (consumption < 100) ? consumption : 100 }}%;">
-                                        {{ consumption }}%
-                                    </div>
-                                </div>
+                                <div data-otm-progress-bar data-actual="assignation.wkld_current" data-total="assignation.wkld_planned"></div>
                             </td>
                         </tr>
                     </tbody>
@@ -94,5 +90,6 @@
         <script type="text/javascript" src="{% static 'js/applications.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/factories.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/controllers.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/directives.js' %}"></script>
     </body>
 </html>
