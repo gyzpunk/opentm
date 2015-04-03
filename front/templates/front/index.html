@@ -4,6 +4,7 @@
     <head>
         <title>Open Team Manager</title>
         <link rel="stylesheet" href="{% static 'vendor/bootstrap/dist/css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/otm.css' %}">
     </head>
 
     <body class="container">
@@ -29,7 +30,7 @@
                 </form>
                 <!-- END : Resource selection form -->
 
-                <alert data-ng-repeat="alert in alert.list" type="{{alert.type}}" close="alert.close($index)">{{alert.msg}}</alert>
+                <alert data-ng-repeat="alert in alert.list" class="animate-fade" type="{{alert.type}}" close="alert.close($index)">{{alert.msg}}</alert>
 
                 <ul class="pager" data-ng-if="currentUserId">
                     <li class="previous"><a data-ng-click="prevSlot()" href="#">&larr; Older</a></li>
@@ -51,7 +52,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-ng-repeat="(taskName,slots) in task_rows">
+                        <tr class="animate-fade" data-ng-repeat="(taskName,slots) in task_rows">
                             <th>{{ taskName }}</th>
                             <td data-ng-repeat="assignation in slots" data-ng-controller="assignationCellController" class="text-right" data-ng-class="{'bg-warning':unsaved}">
                                 <form data-ng-submit="save()">

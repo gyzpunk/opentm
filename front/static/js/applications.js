@@ -1,6 +1,8 @@
-var wkldApp = new angular.module('wkldApp', ['ngResource', 'ui.bootstrap']);
+'use strict';
 
-wkldApp.config(['$httpProvider', '$resourceProvider', function($httpProvider, $resourceProvider) {
+var wkldApp = new angular.module('wkldApp', ['ngResource', 'ngAnimate', 'ui.bootstrap'])
+
+.config(['$httpProvider', '$resourceProvider', function($httpProvider, $resourceProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     $httpProvider.defaults.cache = false;
